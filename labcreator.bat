@@ -106,7 +106,10 @@ echo - LAB CREATOR -
 echo ---------------
 echo by CEOS NETWORK
 echo.
-echo Vous pouvez lancez votre instance avec la commande : vagrant init
+echo Deplacez-vous dans le repertoire de votre projet
+echo Lancez votre instance avec la commande : vagrant init
+echo Connectez vous a celle-ci avec : vagrant ssh NomDeLaVM
+exit
 REM echo Provisionning
 REM echo.
 REM echo [1] Modifier le fichier
