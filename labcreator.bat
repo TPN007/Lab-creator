@@ -96,8 +96,8 @@ if /I '%inst%' == 'N' goto step_3
 
 :step_3
 echo   config.vm.provider "virtualbox" do ^|v^| >> %env%\Vagrantfile
-echo    v.memory = "2048" >> %env%\Vagrantfile
-echo    v.cpus = 2 >> %env%\Vagrantfile
+echo    v.memory = "%ram%" >> %env%\Vagrantfile
+echo    v.cpus = %cpu% >> %env%\Vagrantfile
 echo   end >> %env%\Vagrantfile
 echo end >> %env%\Vagrantfile
 cls
