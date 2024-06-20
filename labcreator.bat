@@ -60,7 +60,7 @@ echo Caracteristiques materiel :
 echo.
 set /p nom=Nom de la machine : 
 set /p cpu=CPUs : 
-set /p ram=RAM : 
+set /p ram=RAM (MB) : 
 set /p ip=Adresse IP : 
 goto create_vagrant_file
 
@@ -106,7 +106,7 @@ echo - LAB CREATOR -
 echo ---------------
 echo by CEOS NETWORK
 echo.
-echo Deplacez-vous dans le repertoire de votre projet
+echo Deplacez-vous dans le repertoire de votre projet : %env%
 echo Lancez votre instance avec la commande : vagrant init
 echo Connectez vous a celle-ci avec : vagrant ssh NomDeLaVM
 exit
