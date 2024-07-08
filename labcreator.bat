@@ -107,7 +107,7 @@ echo ---------------
 echo by CEOS NETWORK
 echo.
 echo Deplacez-vous dans le repertoire de votre projet : %env%
-echo Lancez votre instance avec la commande : vagrant init
+echo Lancez votre instance avec la commande : vagrant up
 echo Connectez vous a celle-ci avec : vagrant ssh NomDeLaVM
 exit
 REM echo Provisionning
