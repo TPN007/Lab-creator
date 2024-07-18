@@ -118,28 +118,3 @@ REM echo.
 REM set /p prov=Choix : 
 REM if /I '%prov%' == '1' code %env%\Vagrantfile
 REM if /I '%prov%' == '2' goto init_instance
-
-:pre_init_instance
-cls
-echo ---------------
-echo - LAB CREATOR -
-echo ---------------
-echo by CEOS NETWORK
-echo.
-echo Initialisation d^'instance
-echo.
-set /p path=Saisir le chemin de l^'environement : 
-set env=%path%
-goto init_instance
-
-:init_instance
-cls
-echo ---------------
-echo - LAB CREATOR -
-echo ---------------
-echo by CEOS NETWORK
-echo.
-echo Initialisation de l^'instance...
-echo.
-cd %env%
-%PROGRAMFILES%\Vagrant\bin\vagrant init
