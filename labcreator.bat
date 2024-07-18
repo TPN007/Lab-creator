@@ -1,8 +1,8 @@
 @echo off
 :menu
-echo ---------------
-echo - LAB CREATOR -
-echo ---------------
+echo ------------------
+echo - LAB CREATOR v1 -
+echo ------------------
 echo by CEOS NETWORK
 echo.
 echo [1] Creer une nouvelle instance
