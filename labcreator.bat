@@ -6,8 +6,8 @@ echo ---------------
 echo by CEOS NETWORK
 echo.
 echo [1] Creer une nouvelle instance
-echo [2] Supprimer une instance (dev)
-echo [3] Initialiser une instance (dev)
+echo [2] Demarrer une instance (dev)
+echo [3] Supprimer une instance (dev)
 echo.
 
 set /p choix=Choix : 
@@ -60,7 +60,7 @@ echo Caracteristiques materiel :
 echo.
 set /p nom=Nom de la machine : 
 set /p cpu=CPUs : 
-set /p ram=RAM : 
+set /p ram=RAM (MB) : 
 set /p ip=Adresse IP : 
 goto create_vagrant_file
 
@@ -96,8 +96,8 @@ if /I '%inst%' == 'N' goto step_3
 
 :step_3
 echo   config.vm.provider "virtualbox" do ^|v^| >> %env%\Vagrantfile
-echo    v.memory = "2048" >> %env%\Vagrantfile
-echo    v.cpus = 2 >> %env%\Vagrantfile
+echo    v.memory = "%ram%" >> %env%\Vagrantfile
+echo    v.cpus = %cpu% >> %env%\Vagrantfile
 echo   end >> %env%\Vagrantfile
 echo end >> %env%\Vagrantfile
 cls
@@ -106,7 +106,10 @@ echo - LAB CREATOR -
 echo ---------------
 echo by CEOS NETWORK
 echo.
-echo Vous pouvez lancez votre instance avec la commande : vagrant init
+echo Deplacez-vous dans le repertoire de votre projet : %env%
+echo Lancez votre instance avec la commande : vagrant up
+echo Connectez vous a celle-ci avec : vagrant ssh NomDeLaVM
+exit
 REM echo Provisionning
 REM echo.
 REM echo [1] Modifier le fichier
@@ -116,7 +119,7 @@ REM set /p prov=Choix :
 REM if /I '%prov%' == '1' code %env%\Vagrantfile
 REM if /I '%prov%' == '2' goto init_instance
 
-:pre_init_instance
+:pre_launch_instance
 cls
 echo ---------------
 echo - LAB CREATOR -
@@ -126,10 +129,9 @@ echo.
 echo Initialisation d^'instance
 echo.
 set /p path=Saisir le chemin de l^'environement : 
-set env=%path%
-goto init_instance
+goto launch_instance
 
-:init_instance
+:launch_instance
 cls
 echo ---------------
 echo - LAB CREATOR -
@@ -138,5 +140,5 @@ echo by CEOS NETWORK
 echo.
 echo Initialisation de l^'instance...
 echo.
-cd %env%
-%PROGRAMFILES%\Vagrant\bin\vagrant init
+cd %path%
+start "C:\Program Files\Vagrant\bin\vagrant"
