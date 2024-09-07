@@ -47,7 +47,7 @@ echo [2] Ubuntu
 echo [3] Autre
 echo.
 set /p choix_os=Choix :  
-if /I '%choix_os%' == '1' set os=generic/debian11
+if /I '%choix_os%' == '1' set os=generic/debian12
 if /I '%choix_os%' == '2' set os=ubuntu/jammy64
 if /I '%choix_os%' == '3' set /p os=OS : 
 cls
