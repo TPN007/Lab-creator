@@ -1,144 +1,182 @@
 @echo off
+setlocal enabledelayedexpansion
+
+:: Menu principal
 :menu
-echo ------------------
-echo - LAB CREATOR v1 -
-echo ------------------
-echo by CEOS NETWORK
+cls
+echo =====================
+echo = LAB CREATOR v2.3 =
+echo =====================
 echo.
-echo [1] Creer une nouvelle instance
-echo [2] Demarrer une instance (dev)
-echo [3] Supprimer une instance (dev)
+echo [1] Creer une instance
+echo [2] Lancer une instance
+echo [3] Supprimer une instance
+echo [4] Quitter
 echo.
 
-set /p choix=Choix : 
-if /I '%choix%'=='1' goto create_instance
-if /I '%choix%'=='2' goto menu
-if /I '%choix%'=='3' goto menu
+set /p choix="Selectionnez une option : "
+if "%choix%"=="1" goto creer_instance
+if "%choix%"=="2" goto demarrer_instance
+if "%choix%"=="3" goto supprimer_instance
+if "%choix%"=="4" exit /b 0
+echo Option invalide. Veuillez reessayer.
+pause
 goto menu
 
-:create_instance
+:: Creer une instance
+:creer_instance
 cls
-echo ---------------
-echo - LAB CREATOR -
-echo ---------------
-echo by CEOS NETWORK
+echo ----------------------------
+echo = Creation d'une instance =
+echo ----------------------------
 echo.
-echo Definition de l^'environement
-echo.
-set /p path=Saisir le chemin de l environement : 
-set /p dir=Saisir le nom du dossier : 
-mkdir %path%\%dir%
-set env=%path%\%dir%
-REM Creation du Vagrant file
-echo Vagrant.configure("2") do ^|config^| > %env%\Vagrantfile
-goto step_1
 
-:step_1
+set /p chemin="Entrez le chemin du repertoire : "
+set /p dossier="Nom du dossier : "
+set env=%chemin%\%dossier%
+
+if exist %env% (
+    echo Le repertoire existe deja. Aucun repertoire cree.
+    pause
+    goto menu
+) else (
+    mkdir "%env%"
+    if errorlevel 1 (
+        echo Erreur : Impossible de creer le repertoire.
+        pause
+        goto menu
+    )
+)
+
+echo Vagrant.configure("2") do ^|config^| > "%env%\Vagrantfile"
+echo Fichier Vagrantfile initialise avec succes.
+goto choix_os
+
+:: Choisir l'OS
+:choix_os
 cls
-echo ---------------
-echo - LAB CREATOR -
-echo ---------------
-echo by CEOS NETWORK
-echo.
-echo Choix de l^'OS : 
+echo ---------------------
+echo = Choix du systeme OS =
+echo ---------------------
 echo.
 echo [1] Debian
 echo [2] Ubuntu
 echo [3] Autre
 echo.
-set /p choix_os=Choix :  
-if /I '%choix_os%' == '1' set os=generic/debian12
-if /I '%choix_os%' == '2' set os=ubuntu/jammy64
-if /I '%choix_os%' == '3' set /p os=OS : 
-cls
-echo ---------------
-echo - LAB CREATOR -
-echo ---------------
-echo by CEOS NETWORK
-echo.
-echo Caracteristiques materiel :
-echo.
-set /p nom=Nom de la machine : 
-set /p cpu=CPUs : 
-set /p ram=RAM (MB) : 
-set /p ip=Adresse IP : 
-goto create_vagrant_file
 
-:create_vagrant_file
-cls
-echo ---------------
-echo - LAB CREATOR -
-echo ---------------
-echo by CEOS NETWORK
-echo.
-echo Creation de l instance :
-echo.
-echo   config.vm.define "%nom%" do ^|%nom%^| >> %env%\Vagrantfile
-echo    %nom%.vm.box = "%os%" >> %env%\Vagrantfile
-echo    %nom%.vm.hostname = '%nom%' >> %env%\Vagrantfile
-echo    %nom%.vm.box_url = "%os%" >> %env%\Vagrantfile
-echo    %nom%.vm.network :private_network, ip: "%ip%" >> %env%\Vagrantfile
-echo    #%nom%.vm.provision >> %env%\Vagrantfile
-echo   end >> %env%\Vagrantfile
-goto step_2
+set /p os_choisi="Selectionnez un OS : "
+if "%os_choisi%"=="1" (
+    set os=generic/debian12
+) else if "%os_choisi%"=="2" (
+    set os=ubuntu/jammy64
+) else if "%os_choisi%"=="3" (
+    set /p os="Entrez le nom de l'OS : "
+) else (
+    echo Choix invalide. Veuillez reessayer.
+    pause
+    goto choix_os
+)
 
-:step_2
-cls
-echo ---------------
-echo - LAB CREATOR -
-echo ---------------
-echo by CEOS NETWORK
-echo.
-echo Voulez-vous ajouter une nouvelle instance ?
-set /p inst=O/N : 
-if /I '%inst%' == 'O' goto step_1
-if /I '%inst%' == 'N' goto step_3
+goto config_machine
 
-:step_3
-echo   config.vm.provider "virtualbox" do ^|v^| >> %env%\Vagrantfile
-echo    v.memory = "%ram%" >> %env%\Vagrantfile
-echo    v.cpus = %cpu% >> %env%\Vagrantfile
-echo   end >> %env%\Vagrantfile
-echo end >> %env%\Vagrantfile
+:: Configurer la machine
+:config_machine
 cls
-echo ---------------
-echo - LAB CREATOR -
-echo ---------------
-echo by CEOS NETWORK
+echo ---------------------------
+echo = Configuration materielle =
+echo ---------------------------
 echo.
-echo Deplacez-vous dans le repertoire de votre projet : %env%
-echo Lancez votre instance avec la commande : vagrant up
-echo Connectez vous a celle-ci avec : vagrant ssh NomDeLaVM
-exit
-REM echo Provisionning
-REM echo.
-REM echo [1] Modifier le fichier
-REM echo [2] Ne pas faire de provisionning
-REM echo.
-REM set /p prov=Choix : 
-REM if /I '%prov%' == '1' code %env%\Vagrantfile
-REM if /I '%prov%' == '2' goto init_instance
 
-:pre_launch_instance
-cls
-echo ---------------
-echo - LAB CREATOR -
-echo ---------------
-echo by CEOS NETWORK
-echo.
-echo Initialisation d^'instance
-echo.
-set /p path=Saisir le chemin de l^'environement : 
-goto launch_instance
+set /p nom_machine="Nom de la machine : "
+set /p cpu="Nombre de CPUs : "
+set /p ram="Memoire (en MB) : "
 
-:launch_instance
+:: Configuration du disque
+set /p disk_size="Taille du disque (en Go) : "
+
+:: Configuration du réseau
+goto config_network
+
+:config_network
 cls
-echo ---------------
-echo - LAB CREATOR -
-echo ---------------
-echo by CEOS NETWORK
+echo ---------------------------
+echo = Configuration reseau =
+echo ---------------------------
 echo.
-echo Initialisation de l^'instance...
+echo [1] DHCP (automatique)
+echo [2] Adresse IP fixe
 echo.
-cd %path%
-start "C:\Program Files\Vagrant\bin\vagrant"
+
+set /p choix_network="Selectionnez une option reseau : "
+if "%choix_network%"=="1" (
+    set network_type=dhcp
+    set ip=""
+
+) else if "%choix_network%"=="2" (
+    set network_type=static
+    set /p ip="Entrez l'adresse IP fixe : "
+) else (
+    echo Choix invalide. Veuillez reessayer.
+    pause
+    goto config_network
+)
+
+goto creer_vagrantfile
+
+:: Creer le fichier Vagrantfile
+:creer_vagrantfile
+(
+    echo   config.vm.define "%nom_machine%" do ^|%nom_machine%^|
+    echo     %nom_machine%.vm.box = "%os%"
+    echo     %nom_machine%.vm.hostname = "%nom_machine%"
+    if "%network_type%"=="dhcp" (
+        echo     %nom_machine%.vm.network "public_network", type: "dhcp"
+    ) else (
+        echo     %nom_machine%.vm.network "public_network", ip: "%ip%"
+    )
+    echo   end
+    echo   config.vm.provider "virtualbox" do ^|v^|
+    echo     v.memory = "%ram%"
+    echo     v.cpus = %cpu%
+    echo     v.customize ["modifyvm", :id, "--vram", "16"]  :: Modification ici
+    echo   end
+    echo end
+) >> "%env%\Vagrantfile"
+
+:: Redimensionner le disque
+"C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" createhd --filename "%env%\%nom_machine%.vdi" --size %disk_size%000
+if errorlevel 1 (
+    echo Erreur : Impossible de configurer le disque.
+    pause
+    goto menu
+)
+
+echo Fichier Vagrantfile et disque configures avec succes.
+pause
+goto menu
+
+:: Lancer une instance
+:demarrer_instance
+cls
+echo ------------------------
+echo = Lancer une instance =
+echo ------------------------
+echo.
+set /p chemin_instance="Entrez le chemin du repertoire de l'instance : "
+cd /d "%chemin_instance%"
+echo Lancement de l'instance avec vagrant up...
+vagrant up
+pause
+
+:: Supprimer une instance
+:supprimer_instance
+cls
+echo ------------------------
+echo = Supprimer une instance =
+echo ------------------------
+echo.
+set /p chemin_instance="Entrez le chemin du repertoire de l'instance : "
+cd /d "%chemin_instance%"
+echo Suppression de l'instance avec vagrant destroy...
+vagrant destroy -f
+pause
