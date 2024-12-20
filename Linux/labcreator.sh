@@ -105,7 +105,7 @@ choix_os() {
   configuration_machine # Passe à la configuration de la machine
 }
 
-# Fonction pour configurer les paramètres de la machine
+# Fonction pour configurer les paramètres de la machine (ajout de la taille du disque virtuel)
 configuration_machine() {
   clear
   echo "------------------------"
@@ -117,7 +117,41 @@ configuration_machine() {
   read -p "Nombre de CPUs : " cpu
   read -p "Mémoire (en MB) : " ram
   read -p "Adresse IP : " ip
-  creer_fichier_vagrant # Appelle la fonction pour générer le Vagrantfile
+
+  # Demande de la taille du disque virtuel
+  read -p "Taille du disque virtuel (en Go) : " disque
+
+  # Choix du type de réseau
+  echo "------------------------"
+  echo "= Configuration du réseau ="
+  echo "------------------------"
+  echo "1) NAT (réseau privé par défaut)"
+  echo "2) Accès par pont (Bridge)"
+  echo
+  read -p "Choisissez le type de réseau : " type_reseau
+  case "$type_reseau" in
+    1) 
+      network_config="config.vm.network :private_network, ip: \"$ip\"" 
+      ;;
+    2) 
+      # Détection automatique d'une interface réseau pour le mode pont
+      interface=$(ip link show | grep -E '^[0-9]+:' | grep -v 'lo' | awk -F: '{print $2}' | head -n 1 | tr -d ' ')
+      if [ -n "$interface" ]; then
+        network_config="config.vm.network :public_network, ip: \"$ip\", bridge: \"$interface\""
+        log_message "INFO" "Interface réseau pont détectée : $interface."
+      else
+        echo "Erreur : Aucune interface réseau disponible pour le mode pont. Utilisation du NAT."
+        log_message "ERROR" "Aucune interface réseau disponible pour le mode pont."
+        network_config="config.vm.network :private_network, ip: \"$ip\""
+      fi
+      ;;
+    *) 
+      echo "Option invalide. Par défaut, NAT sera utilisé."
+      network_config="config.vm.network :private_network, ip: \"$ip\"" 
+      ;;
+  esac
+
+  creer_fichier_vagrant # Passe à la création du Vagrantfile avec la taille du disque
 }
 
 # Fonction pour créer le fichier Vagrantfile avec les paramètres spécifiés
@@ -126,11 +160,12 @@ creer_fichier_vagrant() {
     echo "  config.vm.define \"$nom_machine\" do |$nom_machine|"
     echo "    $nom_machine.vm.box = \"$os\""
     echo "    $nom_machine.vm.hostname = \"$nom_machine\""
-    echo "    $nom_machine.vm.network :private_network, ip: \"$ip\""
+    echo "    $network_config"
     echo "  end"
-    echo "  config.vm.provider \"virtualbox\" do |v|"
-    echo "    v.memory = \"$ram\""
-    echo "    v.cpus = $cpu"
+    echo "  config.vm.provider \"virtualbox\" do |vb|"
+    echo "    vb.memory = \"$ram\""
+    echo "    vb.cpus = $cpu"
+    echo "    vb.customize [\"createhd\", \"--filename\", \"${nom_machine}_disk.vdi\", \"--size\", \"$disque\"]"  # Ajout de la taille du disque virtuel"
     echo "  end"
     echo "end"
   } >> "$environnement/Vagrantfile"
@@ -142,6 +177,7 @@ creer_fichier_vagrant() {
     echo "Erreur : Impossible de créer le fichier Vagrantfile. Consultez $LOG_FILE."
   fi
 }
+
 
 # Fonction pour lancer une instance existante ou qui vient d'être créer
 demarrer_instance() {
