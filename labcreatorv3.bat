@@ -1,7 +1,7 @@
 @echo off
 :menu
 echo ------------------
-echo - LAB CREATOR v2 -
+echo - LAB CREATOR v3 -
 echo ------------------
 echo by CEOS NETWORK
 echo.
@@ -19,7 +19,7 @@ goto menu
 :create_instance
 cls
 echo ---------------
-echo - LAB CREATOR -
+echo - LAB CREATOR v3 -
 echo ---------------
 echo by CEOS NETWORK
 echo.
@@ -36,7 +36,7 @@ goto step_1
 :step_1
 cls
 echo ---------------
-echo - LAB CREATOR -
+echo - LAB CREATOR v3 -
 echo ---------------
 echo by CEOS NETWORK
 echo.
@@ -54,7 +54,7 @@ if /I '%choix_os%' == '3' set os=bento/ubuntu-24.04
 if /I '%choix_os%' == '4' set /P os=OS :
 cls
 echo ---------------
-echo - LAB CREATOR -
+echo - LAB CREATOR v3 -
 echo ---------------
 echo by CEOS NETWORK
 echo.
@@ -124,7 +124,7 @@ goto create_vagrant_file
 :create_vagrant_file
 cls
 echo ---------------
-echo - LAB CREATOR -
+echo - LAB CREATOR v3 -
 echo ---------------
 echo by CEOS NETWORK
 echo.
@@ -157,7 +157,7 @@ goto step_2
 :step_2
 cls
 echo ---------------
-echo - LAB CREATOR -
+echo - LAB CREATOR v3 -
 echo ---------------
 echo by CEOS NETWORK
 echo.
@@ -175,7 +175,7 @@ echo   end >> "%env%\Vagrantfile"
 echo end >> "%env%\Vagrantfile"
 cls
 echo ---------------
-echo - LAB CREATOR -
+echo - LAB CREATOR v3 -
 echo ---------------
 echo by CEOS NETWORK
 echo. 
